@@ -13,11 +13,13 @@ public class MenüüHaldur extends Haldur{
     private void looNupud() {
         looVälju();
         looReeglid();
+        looStart();
     }
 
     private void kontrolliNuppe() {
         kontrolliVälju();
         kontrolliReeglid();
+        kontrolliStart();
     }
 
     private void kontrolliVälju() {
@@ -33,6 +35,15 @@ public class MenüüHaldur extends Haldur{
         });
     }
 
+    private void kontrolliStart() {
+        startNupp.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+                MänguHaldur haldur = new MänguHaldur();
+                juur.getChildren().setAll(haldur.getJuur());
+            }
+        });
+    }
+
     private void looVälju() {
         väljuNupp = new Nupp("Välju", 505, 550);
         juur.getChildren().add(väljuNupp);
@@ -41,5 +52,10 @@ public class MenüüHaldur extends Haldur{
     private void looReeglid() {
         reegliNupp = new Nupp("Reeglid", 505, 450);
         juur.getChildren().add(reegliNupp);
+    }
+
+    private void looStart() {
+        startNupp = new Nupp("Alusta", 505, 350);
+        juur.getChildren().add(startNupp);
     }
 }

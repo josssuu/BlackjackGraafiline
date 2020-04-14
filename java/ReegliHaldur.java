@@ -1,11 +1,7 @@
-
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.paint.Color;
-
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
@@ -65,7 +61,6 @@ public class ReegliHaldur extends Haldur {
             BufferedReader bf = new BufferedReader(new FileReader(reegliFailiTee, StandardCharsets.UTF_8));
             String  rida = bf.readLine();
             while (rida != null) {
-                System.out.print(rida);
                 reeglid.setText(reeglid.getText() + rida + "\n");
                 rida = bf.readLine();
             }

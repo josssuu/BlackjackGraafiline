@@ -22,6 +22,7 @@ public class Nupp extends Button {
     public Nupp(String tekst, int xkord, int ykord) {
         this.xkord = xkord;
         this.ykord = ykord;
+        this.setPrefHeight(49);
         määraFont();
         this.setText(tekst);
 

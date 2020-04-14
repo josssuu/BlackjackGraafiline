@@ -1,3 +1,4 @@
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
@@ -21,7 +22,7 @@ public class Haldur {
     }
 
     private void laeTaust() {
-        Image pilt = new Image("taustapilt.jpg", laius, kõrgus, false,false);
+        Image pilt = new Image(taustapildiTee, laius, kõrgus, false,false);
         Background taustapilt = new Background(new BackgroundImage(pilt, BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, BackgroundPosition.DEFAULT, null));
         juur.setBackground(taustapilt);
     }
@@ -35,5 +36,13 @@ public class Haldur {
 
     public AnchorPane getJuur() {
         return this.juur;
+    }
+
+    public void addChildren(Node laps) {
+        this.juur.getChildren().add(laps);
+    }
+
+    public void setChildren(Node laps) {
+        this.juur.getChildren().setAll(laps);
     }
 }
