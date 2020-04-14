@@ -1,39 +1,36 @@
-|===============================================================================|
-| EESMÄRK:                                                                      |
-| Võita diilerit, milleks on vaja:                                              |
-| 1) saada 21 punkti ilma, et diiler saaks samuti 21.                           |
-| 2) Saada diilerist tugevam punktiarv, aga mitte suurem kui 21.                |
-| 3) Lasta diileril lõhki minna (üle 21 punkti), ise lõhki minemata.            |
-|                                                                               |
-| KAARTIDE VÄÄRTUSED:                                                           |
-| 1) ässa väärtus võib olla igal mänguhetkel kas 1 või 11 punkti.               |
-| 2) iga pildikaarti väärtus on 10 punkti.                                      |
-| 3) iga numbrikaarti väärtus on tema enda number.                              |
-|                                                                               |
-| MÄNGU KÄIK:                                                                   |
-| Mängija teeb vooru panuse.                                                    |
-| Diiler jagab mängijale ja endale 2 kaarti.                                    |
-| Üks diileri kaart jääb mängijale nähtavaks.                                   |
-| Kui mängija saab kohe 21 punkti, on tema võidusumma 1,5-kordne algpanus.      |
-| [NÄIDE: Mängija algpanus on 10 eurot ja saab kasumi 15 eurot]                 |
-| Mängijal on võimalik:                                                         |
-| 1) võtta kaarte juurde                                                        |
-| 2) jääda oma käesolevale summale paigale.                                     |
-| Kui mängija on võtnud nii palju kaarte kui soovib, on diileri kord.           |
-| Diileri käik:                                                                 |
-| 1) diiler avaldab oma nähtamatu kaarti.                                       |
-| 2) diiler võtab kaarte juurde kuni tema summa on 17 punkti või rohkem.        |
-| Kui vooru võidab mängija, saab ta oma panuse võrra rikkamaks.                 |
-| Vastasel juhul kaotab ta oma sisestatud panuse.                               |
-| ------------------------------------------------------------------------------|
-| SIIN MÄNGUS:                                                                  |
-| Konsool võtab kasutajalt sisendi mängija soovitud tegevuse kohta:             |
-| 1) Igal hetkel, kui mängija soovib väljuda mängust, tuleb sisestada----"Välju"|
-| 2) Mängu saab alustada, sisestades oma kasutajanime---------------------"Nimi"|
-| 3) Mängu ajal saab mängija näha oma rahakotti, sisestades---------------"Raha"|
-| 4) Mängija saab kaarti juurde võtta, sisestades--------------------------"Hit"|
-| 5) Mängija saab jääda oma võetud summa juurde, sisestades--------------"Stand"|
-|                                                                               |
-|           NB! Programm aktsepteerib nii suur- kui ka väiketähti!              |
-|                                                                               |
-|===============================================================================|
+EESMÄRK:
+Võita diilerit, milleks on vaja:
+1) saada 21 punkti ilma, et diiler saaks samuti 21.
+2) Saada diilerist tugevam punktiarv, aga mitte suurem kui 21.
+3) Lasta diileril lõhki minna (üle 21 punkti), ise lõhki minemata.
+
+KAARTIDE VÄÄRTUSED:
+1) ässa väärtus võib olla igal mänguhetkel kas 1 või 11 punkti.
+2) iga pildikaarti väärtus on 10 punkti.
+3) iga numbrikaarti väärtus on tema enda number.
+
+MÄNGU KÄIK:
+Mängija teeb vooru panuse.
+Diiler jagab mängijale ja endale 2 kaarti.
+Üks diileri kaart jääb mängijale nähtavaks.
+Kui mängija saab kohe 21 punkti, on tema võidusumma 1,5-kordne algpanus.
+[NÄIDE: Mängija algpanus on 10 eurot ja saab kasumi 15 eurot]
+Mängijal on võimalik:
+1) võtta kaarte juurde
+2) jääda oma käesolevale summale paigale.
+Kui mängija on võtnud nii palju kaarte kui soovib, on diileri kord.
+Diileri käik:
+1) diiler avaldab oma nähtamatu kaarti.
+2) diiler võtab kaarte juurde kuni tema summa on 17 punkti või rohkem.
+Kui vooru võidab mängija, saab ta oma panuse võrra rikkamaks.
+Vastasel juhul kaotab ta oma sisestatud panuse.
+------------------------------------------------------------------------------
+SIIN MÄNGUS:
+Konsool võtab kasutajalt sisendi mängija soovitud tegevuse kohta:
+1) Igal hetkel, kui mängija soovib väljuda mängust, tuleb sisestada----"Välju"
+2) Mängu saab alustada, sisestades oma kasutajanime---------------------"Nimi"
+3) Mängu ajal saab mängija näha oma rahakotti, sisestades---------------"Raha"
+4) Mängija saab kaarti juurde võtta, sisestades--------------------------"Hit"
+5) Mängija saab jääda oma võetud summa juurde, sisestades--------------"Stand"
+
+          NB! Programm aktsepteerib nii suur- kui ka väiketähti!

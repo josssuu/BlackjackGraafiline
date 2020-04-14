@@ -1,16 +1,23 @@
 
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.paint.Color;
+
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 
 public class ReegliHaldur extends Haldur {
     private String reegliFailiTee = "src/main/resources/reeglid.txt";
 
     private Nupp tagasiNupp;
-    private TextArea reeglid;
+    private Label reeglid;
 
     public ReegliHaldur() {
-        laeReeglid();
+        looReeglid();
         looNupud();
         kontrolliNupud();
         kuvaElemendid();
@@ -39,22 +46,32 @@ public class ReegliHaldur extends Haldur {
         });
     }
 
+    private void looReeglid() {
+        laeReeglid();
+        vormistaReeglid();
+    }
+
+    private void vormistaReeglid(){
+        reeglid.setWrapText(true);
+        reeglid.setLayoutX(300);
+        reeglid.setLayoutY(100);
+        reeglid.setBackground(new Background(new BackgroundFill(Color.ALICEBLUE, null, null)));
+    }
+
     private void laeReeglid() {
-        reeglid = new TextArea();
-        // test
-        StringBuilder sisu = new StringBuilder();
+        reeglid = new Label();
+
         try {
-            BufferedReader bf = new BufferedReader(new FileReader("src/main/resources/reeglid.txt"));
-            String rida = bf.readLine();
+            BufferedReader bf = new BufferedReader(new FileReader(reegliFailiTee, StandardCharsets.UTF_8));
+            String  rida = bf.readLine();
             while (rida != null) {
-                sisu.append(rida);
+                System.out.print(rida);
+                reeglid.setText(reeglid.getText() + rida + "\n");
                 rida = bf.readLine();
             }
         }
         catch (Exception e) {
             System.out.println(e + " reeglite viga");
         }
-        reeglid.setText(sisu.toString());
-        reeglid.setEditable(false);
     }
 }
