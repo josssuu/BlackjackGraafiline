@@ -16,7 +16,6 @@ public class Main extends Application {
         MenüüHaldur haldur = new MenüüHaldur();
         pealava.setScene(haldur.getStseen());
     }
-
     public static void main(String[] args) {
         launch(args);
     }
