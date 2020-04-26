@@ -14,12 +14,12 @@ import java.util.ArrayList;
 public class Mäng extends Haldur {
 
     private int panus;
-    private boolean rahaOtsas = false;
+    //private boolean rahaOtsas = false;
 
     private MänguHaldur mänguHaldur;
-    private static Kaardipakk kaardipakk = new Kaardipakk();
-    private static Diiler diiler = new Diiler();
-    private static Mängija mängija = new Mängija();
+    private Kaardipakk kaardipakk = new Kaardipakk();
+    private Diiler diiler = new Diiler();
+    private Mängija mängija = new Mängija();
 
     private Slider panuseSlaider;
     private Nupp panustaNupp;
@@ -90,13 +90,14 @@ public class Mäng extends Haldur {
 
     private void kontrolliPanustaNuppu() {
         panustaNupp.setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getButton() == MouseButton.PRIMARY && !rahaOtsas) {
+            if (mouseEvent.getButton() == MouseButton.PRIMARY) {
                 if (mängija.getKäsi().isEmpty()) {
                     panus = (int) panuseSlaider.getValue();
+                    System.out.println("Panus: " + panus);
                     jagaEsimesedKaardid();
                     kontrolliBlackjacki();
                     diiler.näitaKõikiKaarte();
-                    System.out.println(mängija.getKäsi());
+                    System.out.println("\nMängija käsi: "  + mängija.getKäsi());
                 }
             }
         });
@@ -104,7 +105,7 @@ public class Mäng extends Haldur {
 
     private void kontrolliHitNuppu() {
         hitNupp.setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getButton() == MouseButton.PRIMARY && !rahaOtsas) {
+            if (mouseEvent.getButton() == MouseButton.PRIMARY) {
                 if (panus != 0) {
                     teeHit();
                 }
@@ -114,16 +115,15 @@ public class Mäng extends Haldur {
 
     private void kontrolliStandNuppu() {
         standNupp.setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getButton() == MouseButton.PRIMARY && !rahaOtsas) {
+            if (mouseEvent.getButton() == MouseButton.PRIMARY && panus != 0) {
                 diiler.käik(kaardipakk);
-                if (mängija.käeVäärtus() > diiler.käeVäärtus()) {
-                    mängija.setRaha(mängija.getRaha() + panus);
-                }
-                else if (mängija.käeVäärtus() == diiler.käeVäärtus()) {
-                    alustaUusVoor();
+                System.out.println("Mängija käeväärtus: " + mängija.käeVäärtus());
+                System.out.println("Diileri käeväärtus: " + diiler.käeVäärtus());
+                if (mängija.käeVäärtus() > diiler.käeVäärtus() || diiler.käeVäärtus() > 21) {
+                    alustaUusVoor(panus);
                 }
                 else {
-                    mängija.setRaha(mängija.getRaha() - panus);
+                    alustaUusVoor(-1 * panus);
                 }
             }
         });
@@ -136,38 +136,34 @@ public class Mäng extends Haldur {
         animKaartKätte(kaart);
         System.out.println(mängija.getKäsi());
         if (mängija.käeVäärtus() > 21) {
-            teeLõhki();
+            alustaUusVoor(-1 * panus);
+            System.out.println("lõhki");
         }
     }
 
-    private void teeLõhki() {
-        alustaUusVoor();
-        System.out.println("lõhki");
-    }
-
-    private void alustaUusVoor() {
+    private void alustaUusVoor(int võiduSumma) {
         Kaardipakk uuspakk = new Kaardipakk();
         kaardipakk.setPakk(uuspakk.getPakk());
         kaardipakk.sega_kaardid();
         diiler.setKäsi(new ArrayList<>());
-        mängija.setRaha(mängija.getRaha() - panus);
+        mängija.setRaha(mängija.getRaha() + võiduSumma);
         mängija.setKäsi(new ArrayList<>());
         panus = 0;
 
         if (mängija.getRaha() != 0) {
             panuseSlaider.setMax(mängija.getRaha());
-            System.out.println(mängija.getRaha());
+            System.out.println("Mängija raha: " + mängija.getRaha());
         }
         else {
-            rahaOtsas = true;
             mängLäbiEkraan();
         }
+        System.out.println();
     }
 
     private void kontrolliBlackjacki() {
         if (mängija.käeVäärtus() == 21) {
-            mängija.setRaha(mängija.getRaha() + (int) (panus * 1.5));
-            alustaUusVoor();
+            System.out.println("BLACKJACK!");
+            alustaUusVoor((int) (panus * 1.5));
         }
     }
 

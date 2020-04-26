@@ -26,7 +26,6 @@ public class Diiler {
         catch (Exception e) {
             System.out.println("viga");
         }
-        System.out.println();
     }
 
     public int käeVäärtus() {
