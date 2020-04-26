@@ -24,13 +24,3 @@ Diileri käik:
 2) diiler võtab kaarte juurde kuni tema summa on 17 punkti või rohkem.
 Kui vooru võidab mängija, saab ta oma panuse võrra rikkamaks.
 Vastasel juhul kaotab ta oma sisestatud panuse.
-------------------------------------------------------------------------------
-SIIN MÄNGUS:
-Konsool võtab kasutajalt sisendi mängija soovitud tegevuse kohta:
-1) Igal hetkel, kui mängija soovib väljuda mängust, tuleb sisestada----"Välju"
-2) Mängu saab alustada, sisestades oma kasutajanime---------------------"Nimi"
-3) Mängu ajal saab mängija näha oma rahakotti, sisestades---------------"Raha"
-4) Mängija saab kaarti juurde võtta, sisestades--------------------------"Hit"
-5) Mängija saab jääda oma võetud summa juurde, sisestades--------------"Stand"
-
-          NB! Programm aktsepteerib nii suur- kui ka väiketähti!

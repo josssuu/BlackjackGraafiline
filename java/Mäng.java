@@ -12,6 +12,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class Mäng extends Haldur {
+
     private int panus;
     private boolean rahaOtsas = false;
 

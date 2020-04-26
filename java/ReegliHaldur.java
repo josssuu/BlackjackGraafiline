@@ -1,7 +1,12 @@
 import javafx.scene.control.Label;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+
+import java.awt.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
@@ -49,9 +54,11 @@ public class ReegliHaldur extends Haldur {
 
     private void vormistaReeglid(){
         reeglid.setWrapText(true);
+        reeglid.setTextFill(Color.BLACK);
         reeglid.setLayoutX(300);
         reeglid.setLayoutY(100);
-        reeglid.setBackground(new Background(new BackgroundFill(Color.ALICEBLUE, null, null)));
+        reeglid.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
+
     }
 
     private void laeReeglid() {
