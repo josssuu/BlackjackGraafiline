@@ -1,10 +1,4 @@
 import javafx.animation.*;
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -13,27 +7,14 @@ import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Paint;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.util.Duration;
-import org.w3c.dom.css.Rect;
-
-import javax.naming.TimeLimitExceededException;
-import java.awt.*;
-import java.security.Key;
-import java.sql.Time;
 import java.util.ArrayList;
 
 public class Mäng extends Haldur {
-
     private int panus;
-    //private boolean rahaOtsas = false;
 
     private MänguHaldur mänguHaldur;
     private Kaardipakk kaardipakk = new Kaardipakk();
@@ -105,12 +86,7 @@ public class Mäng extends Haldur {
         rahaSumma.setFont(new Font("Font/EbGaramond12RegularAllSmallcaps-PpOZ.ttf", 30));
         rahaSumma.setTextFill(Color.WHITE);
 
-        panuseSlaider.valueProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-                rahaSumma.setText(Integer.toString((int) panuseSlaider.getValue()));
-            }
-        });
+        panuseSlaider.valueProperty().addListener((observableValue, number, t1) -> rahaSumma.setText(Integer.toString((int) panuseSlaider.getValue())));
 
         komplekt.getChildren().addAll(rahaSumma, painuti, panustaTagus);
         this.mänguHaldur.addChildren(komplekt);
@@ -184,15 +160,11 @@ public class Mäng extends Haldur {
                 }
 
                 if (mängija.käeVäärtus() > diiler.käeVäärtus() || diiler.käeVäärtus() > 21) {   // Mängija võit
-                    kuvaTeade("VÕITSID  " + panus + " EUROT!").setOnFinished(e -> {
-                        kuvaTeade("TEE OMA PANUS");
-                    });
+                    kuvaTeade("VÕITSID  " + panus + " EUROT!").setOnFinished(e -> kuvaTeade("TEE OMA PANUS"));
                     alustaUusVoor(panus);
                 }
                 else {      // Mängija kaotus
-                    kuvaTeade("KAOTASID  " + panus + " EUROT!").setOnFinished(e -> {
-                        kuvaTeade("TEE OMA PANUS");
-                    });
+                    kuvaTeade("KAOTASID  " + panus + " EUROT!").setOnFinished(e -> kuvaTeade("TEE OMA PANUS"));
                     alustaUusVoor(-1 * panus);
                 }
             }
@@ -205,9 +177,7 @@ public class Mäng extends Haldur {
         animKaartKätte(kaart, mängija.getKäsi().size() - 1, true, false);
 
         if (mängija.käeVäärtus() > 21) {
-            kuvaTeade("LÄKSID LÕHKI!").setOnFinished(e -> {
-                kuvaTeade("TEE OMA PANUS");
-            });
+            kuvaTeade("LÄKSID LÕHKI!").setOnFinished(e -> kuvaTeade("TEE OMA PANUS"));
             System.out.println("LÕHKI!");
             alustaUusVoor(-1 * panus);
         }
@@ -245,7 +215,6 @@ public class Mäng extends Haldur {
     }
 
     private void jagaEsimesedKaardid() {
-        SequentialTransition st = new SequentialTransition();
         for (int i = 0; i < 2; i++) {
             Kaart mängijaKaart = kaardipakk.anna_kaart();
             mängija.võtaKaart(mängijaKaart);
@@ -307,9 +276,7 @@ public class Mäng extends Haldur {
         }
 
         panustaNuppAktiivne = false;
-        pt.setOnFinished(e -> {
-            panustaNuppAktiivne = true;
-        });
+        pt.setOnFinished(e -> panustaNuppAktiivne = true);
         pt.play();
     }
 
@@ -319,13 +286,16 @@ public class Mäng extends Haldur {
         int startX = laius - 43 - 90;
         int startY = 40;
 
-        int lõppY = 500;
-        if (!mängijale) lõppY = 200;
+
+        int lõppY = !mängijale ? 200 : 500;
         int esimeseKaardiLõppX = 200;
         int lõppX = esimeseKaardiLõppX + mitmesKaart * 40;
+        /*
         String kaarditee = "\\Kaardid\\" + kaart.toString() + ".png";
         //Kui jagatav kaart on diilerile, esimene ja tegemist ei ole lõppvooruga siis kuvame tagurpidi
         if (!mängijale && mitmesKaart == 0 && !diileriLõppVoor) kaarditee = "\\Kaardid\\tagakulg.png";
+         */
+        String kaarditee = "\\Kaardid\\tagakulg.png";
         Image kaardipilt = new Image(kaarditee, 93, 126, true,false);
         ImageView iv = new ImageView(kaardipilt);
         StackPane kaardikoht = new StackPane();
@@ -340,11 +310,19 @@ public class Mäng extends Haldur {
         KeyValue kv2 = new KeyValue(kaardikoht.layoutYProperty(), lõppY);
         KeyFrame kf = new KeyFrame(new Duration(500), kv1, kv2);
         tl.getKeyFrames().add(kf);
+        tl.setOnFinished(e -> {
+            // Kui pole diileri esimene kaart, siis keeratakse lõpus kaart ümber
+            if (!(!mängijale && mitmesKaart == 0 && !diileriLõppVoor)) {
+                String näoTee = "\\Kaardid\\" + kaart.toString() + ".png";
+                Image näoPilt = new Image(näoTee, 93, 126, true,false);
+                ImageView pildiVaade = new ImageView(näoPilt);
+                kaardikoht.getChildren().setAll(pildiVaade);
+            }
+        });
         tl.play();
     }
 
     private SequentialTransition kuvaTeade(String sõnum) {
-
         Label silt = new Label(sõnum);
         silt.setTextFill(Color.WHITE);
         silt.setFont(new Font("Font/EbGaramond12RegularAllSmallcaps-PpOZ.ttf", 50));

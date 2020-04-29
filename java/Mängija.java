@@ -22,11 +22,13 @@ public class Mängija {
         this.käsi.add(kaart);
     }
 
+    /*
     public void näitaKaarte() {
         for (Kaart kaart : käsi) {
             System.out.print(kaart + " ");
         }
     }
+     */
 
     public int käeVäärtus() {
         int summa = 0;

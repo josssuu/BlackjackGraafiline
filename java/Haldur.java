@@ -26,9 +26,12 @@ public class Haldur {
         Background taustapilt = new Background(new BackgroundImage(pilt, BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, BackgroundPosition.DEFAULT, null));
         juur.setBackground(taustapilt);
     }
+
+    /*
     public Stage getPealava() {
         return this.pealava;
     }
+     */
 
     public Scene getStseen() {
         return this.stseen;

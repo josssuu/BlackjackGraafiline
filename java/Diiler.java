@@ -12,10 +12,6 @@ public class Diiler {
         this.käsi.add(kaart);
     }
 
-    public void näitaAlguseKaarte() {
-        System.out.println(käsi.get(0) + "|*| ");
-    }
-
     public void näitaKõikiKaarte() {
         try {
             for (Kaart kaart : käsi) {
