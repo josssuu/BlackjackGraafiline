@@ -61,8 +61,7 @@ public class Diiler {
             võtaKaart(võetav);
             System.out.print(võetav + " ");
         }
-        System.out.println();
-
+        System.out.println("   - " + this.käeVäärtus());
     }
 
     public void setKäsi(List<Kaart> käsi) {

@@ -23,11 +23,9 @@ public class Mängija {
     }
 
     public void näitaKaarte() {
-        System.out.print(nimi + " kaardid: ");
         for (Kaart kaart : käsi) {
             System.out.print(kaart + " ");
         }
-        System.out.print("\n");
     }
 
     public int käeVäärtus() {

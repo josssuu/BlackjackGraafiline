@@ -17,12 +17,17 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Paint;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import org.w3c.dom.css.Rect;
 
+import javax.naming.TimeLimitExceededException;
 import java.awt.*;
+import java.security.Key;
+import java.sql.Time;
 import java.util.ArrayList;
 
 public class Mäng extends Haldur {
@@ -39,12 +44,21 @@ public class Mäng extends Haldur {
     private Nupp panustaNupp;
     private Nupp hitNupp;
     private Nupp standNupp;
+    private boolean panustaNuppAktiivne = true;
 
     public Mäng(String mängijanimi, MänguHaldur mänguHaldur) {
         this.mänguHaldur = mänguHaldur;
         mängija.setNimi(mängijanimi);
         laeMängulaud();
 
+    }
+
+    private void andmed() {
+        System.out.println("\nMängija nimi: " + mängija.getNimi());
+        System.out.println("Mängija raha: " + mängija.getRaha());
+        System.out.println("Panus: " + panus);
+        System.out.println("Mängija kaardid: " + mängija.getKäsi() + "   - " + mängija.käeVäärtus());
+        System.out.println("Diileri kaardid: " + diiler.getKäsi() + "   - " + diiler.käeVäärtus());
     }
 
     private void laeMängulaud() {
@@ -64,6 +78,8 @@ public class Mäng extends Haldur {
     }
 
     private void looPanustamisKomplekt() {
+        kuvaTeade("TEE OMA PANUS");
+
         VBox komplekt = new VBox();
         //komplekt.setStyle("-fx-background-color: #DC143C");
         komplekt.setLayoutY(100);
@@ -125,15 +141,17 @@ public class Mäng extends Haldur {
 
     private void kontrolliPanustaNuppu() {
         panustaNupp.setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+            if (mouseEvent.getButton() == MouseButton.PRIMARY && panustaNuppAktiivne) {
+                System.out.println("--- PANUSTA ---");
+
                 if (mängija.getKäsi().isEmpty()) {
                     panus = (int) panuseSlaider.getValue();
-                    System.out.println("Panus: " + panus);
                     jagaEsimesedKaardid();
                     kontrolliBlackjacki();
                     diiler.näitaKõikiKaarte();
-                    System.out.println("\nMängija käsi: "  + mängija.getKäsi());
                 }
+
+                andmed();
             }
         });
     }
@@ -141,9 +159,13 @@ public class Mäng extends Haldur {
     private void kontrolliHitNuppu() {
         hitNupp.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+                System.out.println("--- HIT ---");
+
                 if (panus != 0) {
                     teeHit();
                 }
+
+                andmed();
             }
         });
     }
@@ -151,17 +173,26 @@ public class Mäng extends Haldur {
     private void kontrolliStandNuppu() {
         standNupp.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.PRIMARY && panus != 0) {
+                System.out.println("--- STAND ---");
+                andmed();
+
                 diiler.käik(kaardipakk);
                 //Diiler teeb käigu ära ja siis tehakse ekraanile need kaardid järjest nähtavaks
+                //FIXME See teeb siin nii, et diileri kaardid tuleksid uuesti kaardipakist. Tegelt võiks mingi muutuja selle jaoks olla.
                 for (int i = 0; i < diiler.getKäsi().size(); i++) {
                     animKaartKätte(diiler.getKäsi().get(i), i, false,true);
                 }
-                System.out.println("Mängija käeväärtus: " + mängija.käeVäärtus());
-                System.out.println("Diileri käeväärtus: " + diiler.käeVäärtus());
-                if (mängija.käeVäärtus() > diiler.käeVäärtus() || diiler.käeVäärtus() > 21) {
+
+                if (mängija.käeVäärtus() > diiler.käeVäärtus() || diiler.käeVäärtus() > 21) {   // Mängija võit
+                    kuvaTeade("VÕITSID  " + panus + " EUROT!").setOnFinished(e -> {
+                        kuvaTeade("TEE OMA PANUS");
+                    });
                     alustaUusVoor(panus);
                 }
-                else {
+                else {      // Mängija kaotus
+                    kuvaTeade("KAOTASID  " + panus + " EUROT!").setOnFinished(e -> {
+                        kuvaTeade("TEE OMA PANUS");
+                    });
                     alustaUusVoor(-1 * panus);
                 }
             }
@@ -173,16 +204,18 @@ public class Mäng extends Haldur {
         mängija.võtaKaart(kaart);
         animKaartKätte(kaart, mängija.getKäsi().size() - 1, true, false);
 
-        System.out.println(mängija.getKäsi());
         if (mängija.käeVäärtus() > 21) {
-            kuvaTeade("LÄKSID LÕHKI!");
-            System.out.println("lõhki");
+            kuvaTeade("LÄKSID LÕHKI!").setOnFinished(e -> {
+                kuvaTeade("TEE OMA PANUS");
+            });
+            System.out.println("LÕHKI!");
             alustaUusVoor(-1 * panus);
-
         }
     }
 
     private void alustaUusVoor(int võiduSumma) {
+        andmed();
+
         Kaardipakk uuspakk = new Kaardipakk();
         kaardipakk.setPakk(uuspakk.getPakk());
         kaardipakk.sega_kaardid();
@@ -191,32 +224,23 @@ public class Mäng extends Haldur {
         mängija.setKäsi(new ArrayList<>());
         panus = 0;
         //eemaldame kaardid mänguväljalt
-        for (Node n : this.mänguHaldur.getJuur().getChildren()) {
-            System.out.println(n);
-            if (n instanceof StackPane) {
-                Platform.runLater(new Runnable() {
-                    @Override public void run() {
-                        mänguHaldur.getJuur().getChildren().remove(n);
-                        System.out.println("eemaldatud");
-                    }
-                });
-            }
-        }
+        animKaardidÄra();
 
         if (mängija.getRaha() != 0) {
             panuseSlaider.setMax(mängija.getRaha());
-            System.out.println("Mängija raha: " + mängija.getRaha());
         }
         else {
             mängLäbiEkraan();
         }
-        System.out.println();
+
+        System.out.println("---------------------------------------------------");
     }
 
     private void kontrolliBlackjacki() {
         if (mängija.käeVäärtus() == 21) {
             System.out.println("BLACKJACK!");
             alustaUusVoor((int) (panus * 1.5));
+            andmed();
         }
     }
 
@@ -266,40 +290,86 @@ public class Mäng extends Haldur {
     }
 
     private void animKaardidÄra() {
+        ParallelTransition pt = new ParallelTransition();
+        pt.setCycleCount(1);
+        pt.setDelay(new Duration(5000));
+        for (Node n : this.mänguHaldur.getJuur().getChildren()) {
+            if (n instanceof StackPane) {
+                Timeline tl = new Timeline();
 
+                KeyValue kvX = new KeyValue(n.layoutXProperty(), laius - 40 - 93);
+                KeyValue kvY = new KeyValue(n.layoutYProperty(), 40);
+                KeyFrame kf = new KeyFrame(new Duration(500), kvX, kvY);
+
+                tl.getKeyFrames().add(kf);
+                pt.getChildren().add(tl);
+            }
+        }
+
+        panustaNuppAktiivne = false;
+        pt.setOnFinished(e -> {
+            panustaNuppAktiivne = true;
+        });
+        pt.play();
     }
 
     private void animKaartKätte(Kaart kaart, int mitmesKaart, boolean mängijale, boolean diileriLõppVoor) {
-        int y = 500;
-        if (!mängijale) y = 200;
-        int esimeseKaardiX = 200;
-        int x = esimeseKaardiX + mitmesKaart * 40;
+
+        // Kaardi sätted
+        int startX = laius - 43 - 90;
+        int startY = 40;
+
+        int lõppY = 500;
+        if (!mängijale) lõppY = 200;
+        int esimeseKaardiLõppX = 200;
+        int lõppX = esimeseKaardiLõppX + mitmesKaart * 40;
         String kaarditee = "\\Kaardid\\" + kaart.toString() + ".png";
         //Kui jagatav kaart on diilerile, esimene ja tegemist ei ole lõppvooruga siis kuvame tagurpidi
         if (!mängijale && mitmesKaart == 0 && !diileriLõppVoor) kaarditee = "\\Kaardid\\tagakulg.png";
         Image kaardipilt = new Image(kaarditee, 93, 126, true,false);
         ImageView iv = new ImageView(kaardipilt);
         StackPane kaardikoht = new StackPane();
-        kaardikoht.setLayoutY(y);
-        kaardikoht.setLayoutX(x);
+        kaardikoht.setLayoutX(startX);
+        kaardikoht.setLayoutY(startY);
         kaardikoht.getChildren().add(iv);
         this.mänguHaldur.addChildren(kaardikoht);
+
+        // Animatsioon
+        Timeline tl = new Timeline();
+        KeyValue kv1 = new KeyValue(kaardikoht.layoutXProperty(), lõppX);
+        KeyValue kv2 = new KeyValue(kaardikoht.layoutYProperty(), lõppY);
+        KeyFrame kf = new KeyFrame(new Duration(500), kv1, kv2);
+        tl.getKeyFrames().add(kf);
+        tl.play();
     }
 
-    private void kuvaTeade(String sõnum) {
+    private SequentialTransition kuvaTeade(String sõnum) {
 
         Label silt = new Label(sõnum);
         silt.setTextFill(Color.WHITE);
         silt.setFont(new Font("Font/EbGaramond12RegularAllSmallcaps-PpOZ.ttf", 50));
-        silt.setLayoutX(laius/2);
-        silt.setLayoutY(kõrgus / 2);
-        FadeTransition teateKuvaja = new FadeTransition(Duration.seconds(2), silt);
-        teateKuvaja.setFromValue(1);
-        teateKuvaja.setToValue(0);
-        teateKuvaja.setCycleCount(1);
-        teateKuvaja.setAutoReverse(false);
-        //if (mängija.käeVäärtus() > 21) teateKuvaja.setOnFinished(e -> alustaUusVoor(-1 * panus));
+        silt.setLayoutX(laius / 2.0 -  150);
+        silt.setLayoutY(kõrgus / 2.0 - 100);
+
+        FadeTransition sisse = new FadeTransition(new Duration(500), silt);
+        sisse.setFromValue(0);
+        sisse.setToValue(1);
+        sisse.setCycleCount(1);
+        sisse.setAutoReverse(false);
+
+        PauseTransition paus = new PauseTransition(new Duration(5000));
+
+        FadeTransition välja = new FadeTransition(new Duration(500), silt);
+        välja.setFromValue(1);
+        välja.setToValue(0);
+        välja.setCycleCount(1);
+        välja.setAutoReverse(false);
+
+        SequentialTransition teateKuvaja = new SequentialTransition(sisse, paus, välja);
         teateKuvaja.play();
+
         this.mänguHaldur.addChildren(silt);
+
+        return teateKuvaja;
     }
 }
