@@ -1,7 +1,9 @@
+import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.EventType;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -17,6 +19,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 import org.w3c.dom.css.Rect;
 
 import java.awt.*;
@@ -51,8 +54,7 @@ public class Mäng extends Haldur {
     }
 
     private void looKaardipakk() {
-        //Tegin selle praegu Stackpane'iga, ei tea kas see on kõige parem variant, aga eks paistab
-        StackPane kaardipakikoht = new StackPane();
+        AnchorPane kaardipakikoht = new AnchorPane();
         kaardipakikoht.setLayoutY(40);
         kaardipakikoht.setLayoutX(laius - 40 - 93);
         Image kaardipakk = new Image("\\Kaardid\\tagakulg.png", 93, 126, true,false);
@@ -150,6 +152,10 @@ public class Mäng extends Haldur {
         standNupp.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.PRIMARY && panus != 0) {
                 diiler.käik(kaardipakk);
+                //Diiler teeb käigu ära ja siis tehakse ekraanile need kaardid järjest nähtavaks
+                for (int i = 0; i < diiler.getKäsi().size(); i++) {
+                    animKaartKätte(diiler.getKäsi().get(i), i, false,true);
+                }
                 System.out.println("Mängija käeväärtus: " + mängija.käeVäärtus());
                 System.out.println("Diileri käeväärtus: " + diiler.käeVäärtus());
                 if (mängija.käeVäärtus() > diiler.käeVäärtus() || diiler.käeVäärtus() > 21) {
@@ -165,12 +171,15 @@ public class Mäng extends Haldur {
     private void teeHit() {
         Kaart kaart = kaardipakk.anna_kaart();
         mängija.võtaKaart(kaart);
-        animKaartKätte(kaart, mängija.getKäsi().size() - 1);
+        animKaartKätte(kaart, mängija.getKäsi().size() - 1, true, false);
 
         System.out.println(mängija.getKäsi());
         if (mängija.käeVäärtus() > 21) {
-            alustaUusVoor(-1 * panus);
+            kuvaTeade("LÄKSID LÕHKI!");
             System.out.println("lõhki");
+            maga(2.0);
+            alustaUusVoor(-1 * panus);
+
         }
     }
 
@@ -194,10 +203,6 @@ public class Mäng extends Haldur {
                 });
             }
         }
-        System.out.println();
-        for (Node n : this.mänguHaldur.getJuur().getChildren()) {
-            System.out.println(n);
-        }
 
         if (mängija.getRaha() != 0) {
             panuseSlaider.setMax(mängija.getRaha());
@@ -217,12 +222,14 @@ public class Mäng extends Haldur {
     }
 
     private void jagaEsimesedKaardid() {
+        SequentialTransition st = new SequentialTransition();
         for (int i = 0; i < 2; i++) {
             Kaart mängijaKaart = kaardipakk.anna_kaart();
             mängija.võtaKaart(mängijaKaart);
-            animKaartKätte(mängijaKaart, i);
+            animKaartKätte(mängijaKaart, i, true, false);
             Kaart diileriKaart = kaardipakk.anna_kaart();
             diiler.võtaKaart(diileriKaart);
+            animKaartKätte(diileriKaart, i, false, false);
         }
     }
 
@@ -263,12 +270,14 @@ public class Mäng extends Haldur {
 
     }
 
-    private void animKaartKätte(Kaart kaart, int mitmesKaart) {
+    private void animKaartKätte(Kaart kaart, int mitmesKaart, boolean mängijale, boolean diileriLõppVoor) {
         int y = 500;
+        if (!mängijale) y = 200;
         int esimeseKaardiX = 200;
         int x = esimeseKaardiX + mitmesKaart * 40;
         String kaarditee = "\\Kaardid\\" + kaart.toString() + ".png";
-        System.out.println(kaarditee);
+        //Kui jagatav kaart on diilerile, esimene ja tegemist ei ole lõppvooruga siis kuvame tagurpidi
+        if (!mängijale && mitmesKaart == 0 && !diileriLõppVoor) kaarditee = "\\Kaardid\\tagakulg.png";
         Image kaardipilt = new Image(kaarditee, 93, 126, true,false);
         ImageView iv = new ImageView(kaardipilt);
         StackPane kaardikoht = new StackPane();
@@ -276,5 +285,22 @@ public class Mäng extends Haldur {
         kaardikoht.setLayoutX(x);
         kaardikoht.getChildren().add(iv);
         this.mänguHaldur.addChildren(kaardikoht);
+    }
+
+    private void kuvaTeade(String sõnum) {
+
+        Label silt = new Label(sõnum);
+        silt.setTextFill(Color.WHITE);
+        silt.setFont(new Font("Font/EbGaramond12RegularAllSmallcaps-PpOZ.ttf", 50));
+        silt.setLayoutX(laius/2);
+        silt.setLayoutY(kõrgus / 2);
+        FadeTransition teateKuvaja = new FadeTransition(Duration.seconds(2), silt);
+        teateKuvaja.setFromValue(1);
+        teateKuvaja.setToValue(0);
+        teateKuvaja.setCycleCount(1);
+        teateKuvaja.setAutoReverse(false);
+        //if (mängija.käeVäärtus() > 21) teateKuvaja.setOnFinished(e -> alustaUusVoor(-1 * panus));
+        teateKuvaja.play();
+        this.mänguHaldur.addChildren(silt);
     }
 }

@@ -19,7 +19,6 @@ public class Diiler {
     public void näitaKõikiKaarte() {
         try {
             for (Kaart kaart : käsi) {
-                Thread.sleep(1000);
                 System.out.print(kaart + " ");
             }
         }
@@ -68,5 +67,9 @@ public class Diiler {
 
     public void setKäsi(List<Kaart> käsi) {
         this.käsi = käsi;
+    }
+
+    public List<Kaart> getKäsi() {
+        return käsi;
     }
 }
