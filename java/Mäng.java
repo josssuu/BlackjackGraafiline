@@ -177,7 +177,6 @@ public class Mäng extends Haldur {
         if (mängija.käeVäärtus() > 21) {
             kuvaTeade("LÄKSID LÕHKI!");
             System.out.println("lõhki");
-            maga(2.0);
             alustaUusVoor(-1 * panus);
 
         }
