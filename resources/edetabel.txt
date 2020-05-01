@@ -2,4 +2,4 @@ eminem,400
 test,250
 Lil Wayne,245
 asd,226
-Joosu,200
+Joosu,20

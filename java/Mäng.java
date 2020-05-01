@@ -31,9 +31,12 @@ public class Mäng extends Haldur {
     private Nupp standNupp;
     private Nupp lõpetaNupp;
     private boolean panustaNuppAktiivne = true;
+    private boolean hitNuppAktiivne = true;
+    private boolean standNuppAktiivne = true;
     private StackPane diileriEsimeneKaart;
 
     private boolean lõpetaVajutatud = false;
+    private boolean teadeEkraanil = false;
 
     public Mäng(String mängijanimi, MänguHaldur mänguHaldur) {
         this.mänguHaldur = mänguHaldur;
@@ -169,6 +172,31 @@ public class Mäng extends Haldur {
 
     private void kontrolliLõpetaNuppu() {
         lõpetaNupp.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getButton() == MouseButton.PRIMARY && !teadeEkraanil) {
+                if (panus == 0) {
+                    lõpetaVajutatud = true;
+
+                    if (uuendaTop5Faili("src/main/resources/edetabel.txt")) {
+                        kuvaTeade("SAID EDETABELISSE!").setOnFinished(e -> {
+                            MenüüHaldur haldur = new MenüüHaldur();
+                            mänguHaldur.setChildren(haldur.getJuur());
+                        });
+                    }
+                    else {
+                        MenüüHaldur haldur = new MenüüHaldur();
+                        mänguHaldur.setChildren(haldur.getJuur());
+                    }
+                }
+                else {
+                    standNuppAktiivne = false;
+                    hitNuppAktiivne = false;
+                    kuvaTeade("ENNE TULB VOOR LÕPETADA!").setOnFinished(e -> {
+                        standNuppAktiivne = true;
+                        hitNuppAktiivne = true;
+                    });
+                }
+            }
+            /*
             if (mouseEvent.getButton() == MouseButton.PRIMARY && panus == 0) {
                 lõpetaVajutatud = true;
 
@@ -184,12 +212,14 @@ public class Mäng extends Haldur {
             } else if (mouseEvent.getButton() == MouseButton.PRIMARY) {
                 kuvaTeade("ENNE TULEB VOOR LÕPETADA!");
             }
+
+             */
         });
     }
 
     private void kontrolliHitNuppu() {
         hitNupp.setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+            if (mouseEvent.getButton() == MouseButton.PRIMARY && hitNuppAktiivne) {
                 System.out.println("--- HIT ---");
 
                 if (panus != 0) {
@@ -203,7 +233,7 @@ public class Mäng extends Haldur {
 
     private void kontrolliStandNuppu() {
         standNupp.setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getButton() == MouseButton.PRIMARY && panus != 0) {
+            if (mouseEvent.getButton() == MouseButton.PRIMARY && panus != 0 && standNuppAktiivne) {
                 System.out.println("--- STAND ---");
                 andmed();
 
@@ -224,11 +254,17 @@ public class Mäng extends Haldur {
                 st.setOnFinished(o -> {
                     if (mängija.käeVäärtus() == 21) kontrolliBlackjacki();
                     else if (mängija.käeVäärtus() > diiler.käeVäärtus() || diiler.käeVäärtus() > 21) {   // Mängija võit
-                        kuvaTeade("VÕITSID  " + panus + " EUROT!").setOnFinished(e -> kuvaTeade("TEE OMA PANUS"));
-                        alustaUusVoor(panus);
+                        //kuvaTeade("VÕITSID  " + panus + " EUROT!").setOnFinished(e -> kuvaTeade("TEE OMA PANUS"));
+                        kuvaTeade("VÕITSID  " + panus + " EUROT!").setOnFinished(e -> {
+                            alustaUusVoor(panus);
+                            kuvaTeade("TEE OMA PANUS");
+                        });
                     } else {      // Mängija kaotus
-                        kuvaTeade("KAOTASID  " + panus + " EUROT!").setOnFinished(e -> kuvaTeade("TEE OMA PANUS"));
-                        alustaUusVoor(-1 * panus);
+                        //kuvaTeade("KAOTASID  " + panus + " EUROT!").setOnFinished(e -> kuvaTeade("TEE OMA PANUS"));
+                        kuvaTeade("KAOTASID  " + panus + " EUROT!").setOnFinished(e -> {
+                            alustaUusVoor(-1 * panus);
+                            kuvaTeade("TEE OMA PANUS");
+                        });
                     }
                 });
 
@@ -308,7 +344,7 @@ public class Mäng extends Haldur {
     private void animKaardidÄra() {
         ParallelTransition pt = new ParallelTransition();
         pt.setCycleCount(1);
-        pt.setDelay(new Duration(5000));
+        pt.setDelay(new Duration(3000));
         for (Node n : this.mänguHaldur.getJuur().getChildren()) {
             if (n instanceof StackPane) {
                 Timeline tl = new Timeline();
@@ -399,6 +435,9 @@ public class Mäng extends Haldur {
         välja.setAutoReverse(false);
 
         SequentialTransition teateKuvaja = new SequentialTransition(sisse, paus, välja);
+
+        teadeEkraanil = true;
+        teateKuvaja.setOnFinished(e -> teadeEkraanil = false);
         teateKuvaja.play();
 
         this.mänguHaldur.addChildren(silt);
