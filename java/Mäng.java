@@ -153,8 +153,7 @@ public class Mäng extends Haldur {
 
                 if (mängija.getKäsi().isEmpty() && mängija.getRaha() > 0) {
                     panus = (int) panuseSlaider.getValue();
-                    jagaEsimesedKaardid();
-                    kontrolliBlackjacki();
+                    jagaEsimesedKaardid().setOnFinished(e -> kontrolliBlackjacki());
                     diiler.näitaKõikiKaarte();
                 }
 
@@ -220,7 +219,7 @@ public class Mäng extends Haldur {
                 SequentialTransition st = new SequentialTransition();
                 for (int i = 2; i < diiler.getKäsi().size(); i++) {
                     PauseTransition paus = new PauseTransition(new Duration(500));
-                    st.getChildren() .addAll(animKaartKätte(diiler.getKäsi().get(i), i, false,true, false), paus);
+                    st.getChildren() .addAll(paus, animKaartKätte(diiler.getKäsi().get(i), i, false,true, false));
                 }
 
                 st.setOnFinished(o -> {
@@ -286,22 +285,26 @@ public class Mäng extends Haldur {
 
     private void kontrolliBlackjacki() {
         if (mängija.käeVäärtus() == 21) {
+            int võidusumma = mängija.getKäsi().size() == 2 ? (int) (panus * 1.5) : panus;
+
             System.out.println("BLACKJACK!");
-            kuvaTeade("BLACKJACK! VÕITSID " + (int) (panus * 1.5) + " EUROT!").setOnFinished(e -> kuvaTeade("TEE OMA PANUS"));
+            kuvaTeade("BLACKJACK! VÕITSID " + võidusumma + " EUROT!").setOnFinished(e -> kuvaTeade("TEE OMA PANUS"));
             alustaUusVoor((int) (panus * 1.5));
             andmed();
         }
     }
 
-    private void jagaEsimesedKaardid() {
+    private Timeline jagaEsimesedKaardid() {
+        Timeline viimaneAnimatisoon = new Timeline();
         for (int i = 0; i < 2; i++) {
             Kaart mängijaKaart = kaardipakk.anna_kaart();
             mängija.võtaKaart(mängijaKaart);
             animKaartKätte(mängijaKaart, i, true, false, true);
             Kaart diileriKaart = kaardipakk.anna_kaart();
             diiler.võtaKaart(diileriKaart);
-            animKaartKätte(diileriKaart, i, false, false, true);
+            viimaneAnimatisoon = animKaartKätte(diileriKaart, i, false, false, true);
         }
+        return viimaneAnimatisoon;
     }
 
     private void animKaardidÄra() {

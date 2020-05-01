@@ -1,0 +1,4 @@
+1) blackjack ei tohi diilerile kaarte jagada
+2) Kui panus pole tehtud ja vajutad muid nuppe siis võiks tulla tekst "enne tee panus"
+3) edetabeli text fade nagu kastidel
+4) kui raha otsas siis viskab menüüsse

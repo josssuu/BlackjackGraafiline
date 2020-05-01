@@ -1,0 +1,82 @@
+Projekt: Graafilise kasutajaliidesega BlackJack'i mäng
+
+Autorid: Joosep Postov ja Robert Joonas
+
+Programmi kirjeldus:
+Tegemist on klassikalise BlackJacki mänguga, kus kasutaja tegevused (peale kasutajanime
+sisestamist) on määratud hiireklikkide ja nuppude abil.//Joosepi jutt programmi üldsisest tööst//
+
+Klassid:
+ 1) Kaart - kirjeldab ühte kaarti millel on mast, number (või pilt) ja arvuline väärtus
+
+ 2) Kaardipakk - kirjeldab Kaart tüüpi isendite listi. Seal on näiteks meetodid 
+uus_pakk, sega_kaardid, anna_kaart (tagastab listi esimese kaarti)
+
+ 3) Mängija - kirjeldab mängija nime, seda, mis kaartid on parajasti tal käes ja ka seda,
+mis on tema rahakoti väärtus. Sisaldab näiteks meetodit käe_väärtus (mitu punkti käes).
+
+ 4) Diiler - Sarnaneb klassile mängija, mõningate erinevustega (Diileril pole
+rahakotti, diileril on meetod diileriKäik (kas võtab kaarti või mitte)).
+Diileri ainus isendiväli ongi käsi ehk kaartide list.
+
+ 5) Nupp - Buttoni alamklass, määrab mängus konkreetse välimusega ja tööpõhimõttega nupu
+sisaldab näiteks meetodit hiirPeal (kui hiir on peal siis joonistab nupule varju)
+
+ 6) Haldur - klass mis määrab ekraani sätted (nt: meetod laeTaust)
+
+ 7) ReegliHaldur - klass mis määrab selle kuidas kuvatakse ekraanile reeglid.
+(konstruktor koosneb meetoditest: looReegliBoks(); looReeglid(); looNupud(); kontrolliNupud(); kuvaElemendid())
+
+ 8) EdetabeliHaldur - klass mis määrab edetabeli kuvamise ekraanile.
+(konstruktoris: lookastid(); looEdetabel(); kontrolliOkNuppu())
+
+ 9) MenüüHaldur - klass mis määrab, kuidas kuvatakse menüü ekraanile.
+(konstruktor: loonupud(); kontrolliNuppe())
+
+10) mänguHaldur - klass, mis määrab ekraani, mis eelneb vahetult õige mängu ekraanile.
+(tähtsaim meetod: nimeKüsimine())
+
+11) Mäng - klass milles on kogu reaalse mängimise loogika.
+(mänguelementide ekraanile lisamine, slaiderilt väärtuse saamine, kaartide meeleshoidmine jne
+väga palju väga olulisi meetodeid)
+
+12) Main - klass kust käivitub javafx (meetod laeMenüü() ja mäng algab)
+
+Rühmatöö protsess ja ajakulu:
+Töö sujus hästi, peamise mängu loogika pani javafx-iga tööle Joosep. Töö jaotus oli üldjuhul küllaltki
+hästi jaotunud. Aega kulus esialgse BlackJacki uuendamiseks mõlemal umbes 15-20 tundi. Kõik javafx-is 
+juurde tekitatud klassid (Nupp, Haldur, Reegli-, Edetabeli-, Menüü- ja MänguHaldur, Mäng, Main)
+olid Joosepi koostatud, täiendamine oli mõlemapoolne.
+
+Mured ja probleemid:
+Üldjuhul murekohti oli vähe. Kõige suurem ja pingetpakkuvam oli javafx klasside kasutamise keerukus ja
+animatsioonide üheaegne töötamine. See võttis aega, et aru saada.
+
+Testimine:
+Mängu normaalses töötamises veendumiseks testisime seda alati mängides. Üritasime proovida läbi ka
+kasutaja kõikvõimalikud ekslikud sisestused/käitumised.
+
+Hinnang oma tööle:
+Usume, et saime ülesandega hästi hakkama, ning ehk isegi ületasime mänguga esialgseid ootusi.
+Oleme rahul, et saime ka päris palju kogemust javafx kasutamisel.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
