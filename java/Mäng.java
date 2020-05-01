@@ -15,6 +15,7 @@ import javafx.scene.text.Font;
 import javafx.util.Duration;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class Mäng extends Haldur {
@@ -30,12 +31,8 @@ public class Mäng extends Haldur {
     private Nupp hitNupp;
     private Nupp standNupp;
     private Nupp lõpetaNupp;
-    private boolean panustaNuppAktiivne = true;
-    private boolean hitNuppAktiivne = true;
-    private boolean standNuppAktiivne = true;
     private StackPane diileriEsimeneKaart;
 
-    private boolean lõpetaVajutatud = false;
     private boolean teadeEkraanil = false;
 
     public Mäng(String mängijanimi, MänguHaldur mänguHaldur) {
@@ -151,7 +148,7 @@ public class Mäng extends Haldur {
 
     private void kontrolliPanustaNuppu() {
         panustaNupp.setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getButton() == MouseButton.PRIMARY && panustaNuppAktiivne) {
+            if (mouseEvent.getButton() == MouseButton.PRIMARY && !teadeEkraanil) {
                 System.out.println("--- PANUSTA ---");
 
                 if (mängija.getKäsi().isEmpty() && mängija.getRaha() > 0) {
@@ -174,9 +171,7 @@ public class Mäng extends Haldur {
         lõpetaNupp.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.PRIMARY && !teadeEkraanil) {
                 if (panus == 0) {
-                    lõpetaVajutatud = true;
-
-                    if (uuendaTop5Faili("src/main/resources/edetabel.txt")) {
+                    if (uuendaTop5Faili()) {
                         kuvaTeade("SAID EDETABELISSE!").setOnFinished(e -> {
                             MenüüHaldur haldur = new MenüüHaldur();
                             mänguHaldur.setChildren(haldur.getJuur());
@@ -188,38 +183,15 @@ public class Mäng extends Haldur {
                     }
                 }
                 else {
-                    standNuppAktiivne = false;
-                    hitNuppAktiivne = false;
-                    kuvaTeade("ENNE TULB VOOR LÕPETADA!").setOnFinished(e -> {
-                        standNuppAktiivne = true;
-                        hitNuppAktiivne = true;
-                    });
+                    kuvaTeade("ENNE TULB VOOR LÕPETADA!");
                 }
             }
-            /*
-            if (mouseEvent.getButton() == MouseButton.PRIMARY && panus == 0) {
-                lõpetaVajutatud = true;
-
-                if (uuendaTop5Faili("src/main/resources/edetabel.txt")) {
-                    kuvaTeade("SAID EDETABELISSE!").setOnFinished(e -> {
-                        MenüüHaldur haldur = new MenüüHaldur();
-                        mänguHaldur.setChildren(haldur.getJuur());
-                    });
-                } else {
-                    MenüüHaldur haldur = new MenüüHaldur();
-                    mänguHaldur.setChildren(haldur.getJuur());
-                }
-            } else if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-                kuvaTeade("ENNE TULEB VOOR LÕPETADA!");
-            }
-
-             */
         });
     }
 
     private void kontrolliHitNuppu() {
         hitNupp.setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getButton() == MouseButton.PRIMARY && hitNuppAktiivne) {
+            if (mouseEvent.getButton() == MouseButton.PRIMARY && !teadeEkraanil) {
                 System.out.println("--- HIT ---");
 
                 if (panus != 0) {
@@ -233,7 +205,7 @@ public class Mäng extends Haldur {
 
     private void kontrolliStandNuppu() {
         standNupp.setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getButton() == MouseButton.PRIMARY && panus != 0 && standNuppAktiivne) {
+            if (mouseEvent.getButton() == MouseButton.PRIMARY && panus != 0 && !teadeEkraanil) {
                 System.out.println("--- STAND ---");
                 andmed();
 
@@ -254,13 +226,11 @@ public class Mäng extends Haldur {
                 st.setOnFinished(o -> {
                     if (mängija.käeVäärtus() == 21) kontrolliBlackjacki();
                     else if (mängija.käeVäärtus() > diiler.käeVäärtus() || diiler.käeVäärtus() > 21) {   // Mängija võit
-                        //kuvaTeade("VÕITSID  " + panus + " EUROT!").setOnFinished(e -> kuvaTeade("TEE OMA PANUS"));
                         kuvaTeade("VÕITSID  " + panus + " EUROT!").setOnFinished(e -> {
                             alustaUusVoor(panus);
                             kuvaTeade("TEE OMA PANUS");
                         });
                     } else {      // Mängija kaotus
-                        //kuvaTeade("KAOTASID  " + panus + " EUROT!").setOnFinished(e -> kuvaTeade("TEE OMA PANUS"));
                         kuvaTeade("KAOTASID  " + panus + " EUROT!").setOnFinished(e -> {
                             alustaUusVoor(-1 * panus);
                             kuvaTeade("TEE OMA PANUS");
@@ -280,18 +250,16 @@ public class Mäng extends Haldur {
 
         if (mängija.käeVäärtus() > 21) {
             kuvaTeade("LÄKSID LÕHKI! KAOTASID " + panus + " EUROT!").setOnFinished(e -> {
-                if (!lõpetaVajutatud) {
+                alustaUusVoor(-1 * panus);
 
-                    if (mängija.getRaha() - panus > 0) {
-                        kuvaTeade("TEE OMA PANUS");
-                    }
-                    else {
-                        kuvaTeade("SUL ON RAHA OTSAS!");
-                    }
+                if (mängija.getRaha() > 0) {
+                    kuvaTeade("TEE OMA PANUS");
+                }
+                else {
+                    kuvaTeade("SUL ON RAHA OTSAS!");
                 }
             });
             System.out.println("LÕHKI!");
-            alustaUusVoor(-1 * panus);
         }
     }
 
@@ -305,18 +273,13 @@ public class Mäng extends Haldur {
         mängija.setRaha(mängija.getRaha() + võiduSumma);
         mängija.setKäsi(new ArrayList<>());
         panus = 0;
+
         //eemaldame kaardid mänguväljalt
         animKaardidÄra();
 
         if (mängija.getRaha() != 0) {
             panuseSlaider.setMax(mängija.getRaha());
-        }/*
-        else {
-            //mängLäbiEkraan();
-            kuvaTeade("SUL ON RAHA OTSAS!");
         }
-
-       */
 
         System.out.println("---------------------------------------------------");
     }
@@ -344,7 +307,6 @@ public class Mäng extends Haldur {
     private void animKaardidÄra() {
         ParallelTransition pt = new ParallelTransition();
         pt.setCycleCount(1);
-        pt.setDelay(new Duration(3000));
         for (Node n : this.mänguHaldur.getJuur().getChildren()) {
             if (n instanceof StackPane) {
                 Timeline tl = new Timeline();
@@ -358,11 +320,7 @@ public class Mäng extends Haldur {
             }
         }
 
-        panustaNuppAktiivne = false;
-        pt.setOnFinished(e -> {
-            panustaNuppAktiivne = true;
-            if (!lõpetaVajutatud) looKaardipakk();
-        });
+        looKaardipakk();
         pt.play();
     }
 
@@ -376,11 +334,7 @@ public class Mäng extends Haldur {
         int lõppY = !mängijale ? 200 : 500;
         int esimeseKaardiLõppX = 200;
         int lõppX = esimeseKaardiLõppX + mitmesKaart * 40;
-        /*
-        String kaarditee = "\\Kaardid\\" + kaart.toString() + ".png";
-        //Kui jagatav kaart on diilerile, esimene ja tegemist ei ole lõppvooruga siis kuvame tagurpidi
-        if (!mängijale && mitmesKaart == 0 && !diileriLõppVoor) kaarditee = "\\Kaardid\\tagakulg.png";
-         */
+
         String kaarditee = "\\Kaardid\\tagakulg.png";
         Image kaardipilt = new Image(kaarditee, 93, 126, true,false);
         ImageView iv = new ImageView(kaardipilt);
@@ -445,9 +399,9 @@ public class Mäng extends Haldur {
         return teateKuvaja;
     }
 
-    private boolean uuendaTop5Faili(String failinimi) {
+    private boolean uuendaTop5Faili() {
         boolean uuedAndmedSisestatud = false;
-        try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(failinimi), "utf-8"))) {
+        try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("src/main/resources/edetabel.txt"), StandardCharsets.UTF_8))) {
 
             List<String> nimed = new ArrayList<>();
             List<Integer> tulemused = new ArrayList<>();
@@ -472,7 +426,7 @@ public class Mäng extends Haldur {
                 tulemused.add(mängija.getRaha());
                 uuedAndmedSisestatud = true;
             }
-            try(BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(failinimi), "utf-8"))) {
+            try(BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("src/main/resources/edetabel.txt"), StandardCharsets.UTF_8))) {
                 if (nimed.size() <= 5) {
                     for (int i = 0; i < nimed.size(); i++) {
                         bw.write(nimed.get(i) + "," + tulemused.get(i) + "\n");

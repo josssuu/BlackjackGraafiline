@@ -27,12 +27,6 @@ public class Haldur {
         juur.setBackground(taustapilt);
     }
 
-    /*
-    public Stage getPealava() {
-        return this.pealava;
-    }
-     */
-
     public Scene getStseen() {
         return this.stseen;
     }

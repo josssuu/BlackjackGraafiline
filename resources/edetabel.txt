@@ -1,5 +1,5 @@
-eminem,400
-test,250
-Lil Wayne,245
-asd,226
-Joosu,20
+eminem,40
+promees,25
+Lil Wayne,24
+john,22
+kallerdis,9
