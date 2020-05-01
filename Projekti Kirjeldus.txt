@@ -4,7 +4,7 @@ Autorid: Joosep Postov ja Robert Joonas
 
 Programmi kirjeldus:
 Tegemist on klassikalise BlackJacki mänguga, kus kasutaja tegevused (peale kasutajanime
-sisestamist) on määratud hiireklikkide ja nuppude abil.//Joosepi jutt programmi üldsisest tööst//
+sisestamist) on määratud hiireklikkide ja nuppude abil.
 
 Klassid:
  1) Kaart - kirjeldab ühte kaarti millel on mast, number (või pilt) ja arvuline väärtus
@@ -46,7 +46,7 @@ Rühmatöö protsess ja ajakulu:
 Töö sujus hästi, peamise mängu loogika pani javafx-iga tööle Joosep. Töö jaotus oli üldjuhul küllaltki
 hästi jaotunud. Aega kulus esialgse BlackJacki uuendamiseks mõlemal umbes 15-20 tundi. Kõik javafx-is 
 juurde tekitatud klassid (Nupp, Haldur, Reegli-, Edetabeli-, Menüü- ja MänguHaldur, Mäng, Main)
-olid Joosepi koostatud, täiendamine oli mõlemapoolne.
+olid Joosepi koostatud, täiendamine oli mõlemapoolne. Graafilise poole kujundas suurel määral Robert.
 
 Mured ja probleemid:
 Üldjuhul murekohti oli vähe. Kõige suurem ja pingetpakkuvam oli javafx klasside kasutamise keerukus ja
@@ -59,24 +59,3 @@ kasutaja kõikvõimalikud ekslikud sisestused/käitumised.
 Hinnang oma tööle:
 Usume, et saime ülesandega hästi hakkama, ning ehk isegi ületasime mänguga esialgseid ootusi.
 Oleme rahul, et saime ka päris palju kogemust javafx kasutamisel.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
