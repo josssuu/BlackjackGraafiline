@@ -12,17 +12,6 @@ public class Diiler {
         this.käsi.add(kaart);
     }
 
-    public void näitaKõikiKaarte() {
-        try {
-            for (Kaart kaart : käsi) {
-                System.out.print(kaart + " ");
-            }
-        }
-        catch (Exception e) {
-            System.out.println("viga");
-        }
-    }
-
     public int käeVäärtus() {
         int summa = 0;
         int ässadeArv = 0;
@@ -49,7 +38,6 @@ public class Diiler {
         System.out.println("Diiler teeb oma käigu...");
 
         System.out.print("Diileri kaardid: ");
-        näitaKõikiKaarte();
         Kaart võetav;
 
         while (käeVäärtus() < 17) {
