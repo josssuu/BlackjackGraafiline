@@ -5,7 +5,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -78,7 +77,6 @@ public class EdetabeliHaldur extends Haldur {
     private void vormistaEdetabel() {
         edetabel.setWrapText(true);
         edetabel.setTextFill(Color.WHITE);
-        //edetabel.setStyle("-fx-font-weight: bold");
         edetabel.setFont(new Font("Font/EbGaramond12RegularAllSmallcaps-PpOZ.ttf", 52));
         edetabel.setLayoutX(320);
         edetabel.setLayoutY(97);
