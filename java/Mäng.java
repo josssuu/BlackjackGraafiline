@@ -31,6 +31,7 @@ public class Mäng extends Haldur {
     private Nupp standNupp;
     private Nupp lõpetaNupp;
     private boolean panustaNuppAktiivne = true;
+    private StackPane diileriEsimeneKaart;
 
     public Mäng(String mängijanimi, MänguHaldur mänguHaldur) {
         this.mänguHaldur = mänguHaldur;
@@ -201,19 +202,30 @@ public class Mäng extends Haldur {
                 diiler.käik(kaardipakk);
                 //Diiler teeb käigu ära ja siis tehakse ekraanile need kaardid järjest nähtavaks
                 //FIXME See teeb siin nii, et diileri kaardid tuleksid uuesti kaardipakist. Tegelt võiks mingi muutuja selle jaoks olla.
-                for (int i = 0; i < diiler.getKäsi().size(); i++) {
-                    animKaartKätte(diiler.getKäsi().get(i), i, false,true);
-                }
-                if (mängija.käeVäärtus() == 21) kontrolliBlackjacki();
 
-                else if (mängija.käeVäärtus() > diiler.käeVäärtus() || diiler.käeVäärtus() > 21) {   // Mängija võit
-                    kuvaTeade("VÕITSID  " + panus + " EUROT!").setOnFinished(e -> kuvaTeade("TEE OMA PANUS"));
-                    alustaUusVoor(panus);
+                String näoTee = "\\Kaardid\\" + diiler.getKäsi().get(0) + ".png";
+                Image näoPilt = new Image(näoTee, 93, 126, true,false);
+                ImageView pildiVaade = new ImageView(näoPilt);
+                diileriEsimeneKaart.getChildren().setAll(pildiVaade);
+
+                SequentialTransition st = new SequentialTransition();
+                for (int i = 2; i < diiler.getKäsi().size(); i++) {
+                    PauseTransition paus = new PauseTransition(new Duration(500));
+                    st.getChildren() .addAll(animKaartKätte(diiler.getKäsi().get(i), i, false,true, false), paus);
                 }
-                else {      // Mängija kaotus
-                    kuvaTeade("KAOTASID  " + panus + " EUROT!").setOnFinished(e -> kuvaTeade("TEE OMA PANUS"));
-                    alustaUusVoor(-1 * panus);
-                }
+
+                st.setOnFinished(o -> {
+                    if (mängija.käeVäärtus() == 21) kontrolliBlackjacki();
+                    else if (mängija.käeVäärtus() > diiler.käeVäärtus() || diiler.käeVäärtus() > 21) {   // Mängija võit
+                        kuvaTeade("VÕITSID  " + panus + " EUROT!").setOnFinished(e -> kuvaTeade("TEE OMA PANUS"));
+                        alustaUusVoor(panus);
+                    } else {      // Mängija kaotus
+                        kuvaTeade("KAOTASID  " + panus + " EUROT!").setOnFinished(e -> kuvaTeade("TEE OMA PANUS"));
+                        alustaUusVoor(-1 * panus);
+                    }
+                });
+
+                st.play();
             }
         });
     }
@@ -221,7 +233,7 @@ public class Mäng extends Haldur {
     private void teeHit() {
         Kaart kaart = kaardipakk.anna_kaart();
         mängija.võtaKaart(kaart);
-        animKaartKätte(kaart, mängija.getKäsi().size() - 1, true, false);
+        animKaartKätte(kaart, mängija.getKäsi().size() - 1, true, false, true);
 
         if (mängija.käeVäärtus() > 21) {
             kuvaTeade("LÄKSID LÕHKI! KAOTASID " + panus + " EUROT!").setOnFinished(e -> kuvaTeade("TEE OMA PANUS"));
@@ -266,10 +278,10 @@ public class Mäng extends Haldur {
         for (int i = 0; i < 2; i++) {
             Kaart mängijaKaart = kaardipakk.anna_kaart();
             mängija.võtaKaart(mängijaKaart);
-            animKaartKätte(mängijaKaart, i, true, false);
+            animKaartKätte(mängijaKaart, i, true, false, true);
             Kaart diileriKaart = kaardipakk.anna_kaart();
             diiler.võtaKaart(diileriKaart);
-            animKaartKätte(diileriKaart, i, false, false);
+            animKaartKätte(diileriKaart, i, false, false, true);
         }
     }
 
@@ -331,7 +343,7 @@ public class Mäng extends Haldur {
         pt.play();
     }
 
-    private void animKaartKätte(Kaart kaart, int mitmesKaart, boolean mängijale, boolean diileriLõppVoor) {
+    private Timeline animKaartKätte(Kaart kaart, int mitmesKaart, boolean mängijale, boolean diileriLõppVoor, boolean mängiKohe) {
 
         // Kaardi sätted
         int startX = laius - 43 - 90;
@@ -369,8 +381,13 @@ public class Mäng extends Haldur {
                 ImageView pildiVaade = new ImageView(näoPilt);
                 kaardikoht.getChildren().setAll(pildiVaade);
             }
+            else {
+                diileriEsimeneKaart = kaardikoht;
+            }
         });
-        tl.play();
+        if (mängiKohe) tl.play();
+
+        return tl;
     }
 
     private SequentialTransition kuvaTeade(String sõnum) {

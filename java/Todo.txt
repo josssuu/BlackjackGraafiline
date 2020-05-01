@@ -1,5 +1,3 @@
-
-2) diileri kaartide animatsioon
-3) "said edetabelisse" overlapib eelmiste animatsioonidega (tegelt selle teate võib imo ära ka võtta)
-4) raha otsas teade peaks tegema tavaliseks teateks
+1) "said edetabelisse" overlapib eelmiste animatsioonidega (tegelt selle teate võib imo ära ka võtta)
+2) raha otsas teade peaks tegema tavaliseks teateks
 
