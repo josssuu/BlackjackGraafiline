@@ -2,9 +2,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
+import javafx.scene.text.TextAlignment;
 
 import java.awt.*;
 import java.io.*;
@@ -16,16 +20,27 @@ public class ReegliHaldur extends Haldur {
 
     private Nupp tagasiNupp;
     private Label reeglid;
+    private Rectangle reegliBoks;
 
     public ReegliHaldur() {
+        looReegliBoks();
         looReeglid();
         looNupud();
         kontrolliNupud();
         kuvaElemendid();
     }
 
+    private void looReegliBoks() {
+        reegliBoks = new Rectangle(600,600);
+        reegliBoks.setOpacity(0.4);
+        reegliBoks.setLayoutY(73);
+        reegliBoks.setLayoutX(295);
+        reegliBoks.setArcWidth(25);
+        reegliBoks.setArcHeight(25);
+    }
+
     private void kuvaElemendid() {
-        juur.getChildren().addAll(tagasiNupp, reeglid);
+        juur.getChildren().addAll(reegliBoks, tagasiNupp, reeglid);
     }
 
     private void looNupud() {
@@ -37,7 +52,7 @@ public class ReegliHaldur extends Haldur {
     }
 
     private void looTagasiNupp() {
-        tagasiNupp = new Nupp("Tagasi", 900, 700);
+        tagasiNupp = new Nupp("OK", 502, 700);
     }
 
     private void kontrolliTagasi() {
@@ -54,8 +69,11 @@ public class ReegliHaldur extends Haldur {
 
     private void vormistaReeglid(){
         reeglid.setWrapText(true);
-        reeglid.setTextFill(Color.BLACK);
-        reeglid.setLayoutX(300);
+        reeglid.setTextFill(Color.WHITE);
+        reeglid.setStyle("-fx-font-weight: bold");
+        reeglid.setFont(new Font("Font/EbGaramond12RegularAllSmallcaps-PpOZ.ttf", 15));
+        reeglid.setTextAlignment(TextAlignment.CENTER);
+        reeglid.setLayoutX(320);
         reeglid.setLayoutY(100);
         reeglid.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
 

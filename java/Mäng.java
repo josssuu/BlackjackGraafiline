@@ -9,9 +9,13 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
-import java.util.ArrayList;
+
+import java.io.*;
+import java.util.*;
 
 public class Mäng extends Haldur {
     private int panus;
@@ -25,6 +29,7 @@ public class Mäng extends Haldur {
     private Nupp panustaNupp;
     private Nupp hitNupp;
     private Nupp standNupp;
+    private Nupp lõpetaNupp;
     private boolean panustaNuppAktiivne = true;
 
     public Mäng(String mängijanimi, MänguHaldur mänguHaldur) {
@@ -43,9 +48,27 @@ public class Mäng extends Haldur {
     }
 
     private void laeMängulaud() {
+        looKastid();
         looPanustamisKomplekt();
         looTegevusnupud();
         looKaardipakk();
+    }
+
+    private void looKastid() {
+        Rectangle ristkylik = new Rectangle(850, 70,Color.BLACK);
+        ristkylik.setArcHeight(5);
+        ristkylik.setArcWidth(5);
+        ristkylik.setOpacity(0.5);
+        ristkylik.setLayoutX(175);
+        ristkylik.setLayoutY(10);
+
+        Circle ring = new Circle(50);
+        ring.setOpacity(0.4);
+        ring.setLayoutX(120);
+        ring.setLayoutY(137);
+
+        this.mänguHaldur.addChildren(ristkylik);
+        this.mänguHaldur.addChildren(ring);
     }
 
     private void looKaardipakk() {
@@ -62,15 +85,16 @@ public class Mäng extends Haldur {
         kuvaTeade("TEE OMA PANUS");
 
         VBox komplekt = new VBox();
-        //komplekt.setStyle("-fx-background-color: #DC143C");
-        komplekt.setLayoutY(100);
+        komplekt.setLayoutY(120);
         komplekt.setLayoutX(25);
         komplekt.setSpacing(25);
+        komplekt.setAlignment(Pos.CENTER);
 
         panuseSlaider = new Slider(1, mängija.getRaha(), 3);
         panuseSlaider.setOrientation(Orientation.VERTICAL);
         panuseSlaider.setPrefWidth(190);
         panuseSlaider.setPrefHeight(450);
+
 
         GridPane painuti = new GridPane();
         GridPane.setHgrow(panuseSlaider, Priority.ALWAYS);
@@ -82,7 +106,6 @@ public class Mäng extends Haldur {
 
         Label rahaSumma = new Label(Integer.toString((int) panuseSlaider.getValue()));
         rahaSumma.setMinHeight(25);
-        rahaSumma.setTranslateX(88);
         rahaSumma.setFont(new Font("Font/EbGaramond12RegularAllSmallcaps-PpOZ.ttf", 30));
         rahaSumma.setTextFill(Color.WHITE);
 
@@ -98,14 +121,18 @@ public class Mäng extends Haldur {
         hitTagus.getChildren().add(hitNupp);
 
         AnchorPane standTagus = new AnchorPane();
-        standNupp = new Nupp("Stand", 0, 0);
+        standNupp = new Nupp("Seisa", 0, 0);
         standTagus.getChildren().add(standNupp);
 
+        AnchorPane lõpetaTagus = new AnchorPane();
+        lõpetaNupp = new Nupp("Lõpeta mäng", 0, 0);
+        lõpetaTagus.getChildren().add(lõpetaNupp);
+
         HBox riba = new HBox();
-        riba.setLayoutX(150);
-        riba.setLayoutY(700);
-        riba.setSpacing(500);
-        riba.getChildren().addAll(hitTagus, standTagus);
+        riba.setLayoutX(387);
+        riba.setLayoutY(665);
+        riba.setSpacing(100);
+        riba.getChildren().addAll(hitTagus, standTagus, lõpetaTagus);
         mänguHaldur.addChildren(riba);
     }
 
@@ -113,6 +140,7 @@ public class Mäng extends Haldur {
         kontrolliPanustaNuppu();
         kontrolliHitNuppu();
         kontrolliStandNuppu();
+        kontrolliLõpetaNuppu();
     }
 
     private void kontrolliPanustaNuppu() {
@@ -128,6 +156,24 @@ public class Mäng extends Haldur {
                 }
 
                 andmed();
+            }
+        });
+    }
+
+    private void kontrolliLõpetaNuppu() {
+        lõpetaNupp.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getButton() == MouseButton.PRIMARY && panus == 0) {
+                if (uuendaTop5Faili("src/main/resources/edetabel.txt")) {
+                    kuvaTeade("SAID EDETABELISSE!").setOnFinished(e -> {
+                        MenüüHaldur haldur = new MenüüHaldur();
+                        mänguHaldur.setChildren(haldur.getJuur());
+                    });
+                } else {
+                    MenüüHaldur haldur = new MenüüHaldur();
+                    mänguHaldur.setChildren(haldur.getJuur());
+                }
+            } else if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+                kuvaTeade("ENNE TULEB VOOR LÕPETADA!");
             }
         });
     }
@@ -158,8 +204,9 @@ public class Mäng extends Haldur {
                 for (int i = 0; i < diiler.getKäsi().size(); i++) {
                     animKaartKätte(diiler.getKäsi().get(i), i, false,true);
                 }
+                if (mängija.käeVäärtus() == 21) kontrolliBlackjacki();
 
-                if (mängija.käeVäärtus() > diiler.käeVäärtus() || diiler.käeVäärtus() > 21) {   // Mängija võit
+                else if (mängija.käeVäärtus() > diiler.käeVäärtus() || diiler.käeVäärtus() > 21) {   // Mängija võit
                     kuvaTeade("VÕITSID  " + panus + " EUROT!").setOnFinished(e -> kuvaTeade("TEE OMA PANUS"));
                     alustaUusVoor(panus);
                 }
@@ -177,7 +224,7 @@ public class Mäng extends Haldur {
         animKaartKätte(kaart, mängija.getKäsi().size() - 1, true, false);
 
         if (mängija.käeVäärtus() > 21) {
-            kuvaTeade("LÄKSID LÕHKI!").setOnFinished(e -> kuvaTeade("TEE OMA PANUS"));
+            kuvaTeade("LÄKSID LÕHKI! KAOTASID " + panus + " EUROT!").setOnFinished(e -> kuvaTeade("TEE OMA PANUS"));
             System.out.println("LÕHKI!");
             alustaUusVoor(-1 * panus);
         }
@@ -209,6 +256,7 @@ public class Mäng extends Haldur {
     private void kontrolliBlackjacki() {
         if (mängija.käeVäärtus() == 21) {
             System.out.println("BLACKJACK!");
+            kuvaTeade("BLACKJACK! VÕITSID " + (int) (panus * 1.5) + " EUROT!").setOnFinished(e -> kuvaTeade("TEE OMA PANUS"));
             alustaUusVoor((int) (panus * 1.5));
             andmed();
         }
@@ -276,7 +324,10 @@ public class Mäng extends Haldur {
         }
 
         panustaNuppAktiivne = false;
-        pt.setOnFinished(e -> panustaNuppAktiivne = true);
+        pt.setOnFinished(e -> {
+            panustaNuppAktiivne = true;
+            looKaardipakk();
+        });
         pt.play();
     }
 
@@ -326,8 +377,8 @@ public class Mäng extends Haldur {
         Label silt = new Label(sõnum);
         silt.setTextFill(Color.WHITE);
         silt.setFont(new Font("Font/EbGaramond12RegularAllSmallcaps-PpOZ.ttf", 50));
-        silt.setLayoutX(laius / 2.0 -  150);
-        silt.setLayoutY(kõrgus / 2.0 - 100);
+        silt.setLayoutX(185);
+        silt.setLayoutY(10);
 
         FadeTransition sisse = new FadeTransition(new Duration(500), silt);
         sisse.setFromValue(0);
@@ -335,7 +386,7 @@ public class Mäng extends Haldur {
         sisse.setCycleCount(1);
         sisse.setAutoReverse(false);
 
-        PauseTransition paus = new PauseTransition(new Duration(5000));
+        PauseTransition paus = new PauseTransition(new Duration(2000));
 
         FadeTransition välja = new FadeTransition(new Duration(500), silt);
         välja.setFromValue(1);
@@ -349,5 +400,53 @@ public class Mäng extends Haldur {
         this.mänguHaldur.addChildren(silt);
 
         return teateKuvaja;
+    }
+
+    private boolean uuendaTop5Faili(String failinimi) {
+        boolean uuedAndmedSisestatud = false;
+        try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(failinimi), "utf-8"))) {
+
+            List<String> nimed = new ArrayList<>();
+            List<Integer> tulemused = new ArrayList<>();
+            String rida = br.readLine();
+            while (rida != null) {
+                String[] tükid = rida.split(",");
+                nimed.add(tükid[0]);
+                tulemused.add(Integer.parseInt(tükid[1]));
+                rida = br.readLine();
+            }
+            int top5Suurus = 5;
+            if (nimed.size() < 5) top5Suurus = nimed.size();
+            for (int i = 0; i < top5Suurus; i++) {
+                if (mängija.getRaha() > tulemused.get(i) && !uuedAndmedSisestatud) {
+                    nimed.add(i, mängija.getNimi());
+                    tulemused.add(i, mängija.getRaha());
+                    uuedAndmedSisestatud = true;
+                }
+            }
+            if (!uuedAndmedSisestatud && top5Suurus < 5) {
+                nimed.add(mängija.getNimi());
+                tulemused.add(mängija.getRaha());
+                uuedAndmedSisestatud = true;
+            }
+            try(BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(failinimi), "utf-8"))) {
+                if (nimed.size() <= 5) {
+                    for (int i = 0; i < nimed.size(); i++) {
+                        bw.write(nimed.get(i) + "," + tulemused.get(i) + "\n");
+                    }
+                } else {
+                    for (int i = 0; i < 5; i++) {
+                        bw.write(nimed.get(i) + "," + tulemused.get(i) + "\n");
+                    }
+                }
+            } catch (IOException e) {
+                System.out.println("Viga top3 faili kirjutamisel");
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            System.out.println("Viga top3 failist lugemisel");
+            e.printStackTrace();
+        }
+        return uuedAndmedSisestatud;
     }
 }

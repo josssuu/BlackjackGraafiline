@@ -91,7 +91,7 @@ public class Nupp extends Button {
     private void hiirPeal() {
         this.setOnMouseEntered(mouseEvent -> {
             DropShadow vari = new DropShadow();
-            vari.setColor(Color.BLACK);
+            vari.setColor(Color.ALICEBLUE);
             this.setEffect(vari);
         });
     }

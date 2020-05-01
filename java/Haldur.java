@@ -12,7 +12,7 @@ public class Haldur {
     protected Stage pealava;
     protected Scene stseen;
 
-    private String taustapildiTee = "taustapilt.jpg";
+    private String taustapildiTee = "taustapilt.png";
 
     public Haldur() {
         this.juur = new AnchorPane();

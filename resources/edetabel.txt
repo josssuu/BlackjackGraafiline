@@ -1,0 +1,5 @@
+eminem,400
+Lil Wayne,245
+Snoop Dogg,204
+Dr Dre,200
+Chris Brown,101
