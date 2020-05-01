@@ -153,12 +153,11 @@ public class Mäng extends Haldur {
 
                 if (mängija.getKäsi().isEmpty() && mängija.getRaha() > 0) {
                     panus = (int) panuseSlaider.getValue();
-                    jagaEsimesedKaardid().setOnFinished(e -> kontrolliBlackjacki());
-                    diiler.näitaKõikiKaarte();
-                }
-
-                if (mängija.getRaha() == 0) {
-                    kuvaTeade("SUL ON RAHA OTSAS");
+                    teadeEkraanil = true;
+                    jagaEsimesedKaardid().setOnFinished(e -> {
+                        kontrolliBlackjacki();
+                        teadeEkraanil = false;
+                    });
                 }
 
                 andmed();
@@ -196,6 +195,9 @@ public class Mäng extends Haldur {
                 if (panus != 0) {
                     teeHit();
                 }
+                else {
+                    kuvaTeade("ENNE TEE PANUS!");
+                }
 
                 andmed();
             }
@@ -204,40 +206,45 @@ public class Mäng extends Haldur {
 
     private void kontrolliStandNuppu() {
         standNupp.setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getButton() == MouseButton.PRIMARY && panus != 0 && !teadeEkraanil) {
-                System.out.println("--- STAND ---");
-                andmed();
+            if (mouseEvent.getButton() == MouseButton.PRIMARY && !teadeEkraanil) {
+                if (panus != 0) {
+                    System.out.println("--- STAND ---");
+                    andmed();
 
-                diiler.käik(kaardipakk);
-                //Diiler teeb käigu ära ja siis tehakse ekraanile need kaardid järjest nähtavaks.
+                    diiler.käik(kaardipakk);
+                    //Diiler teeb käigu ära ja siis tehakse ekraanile need kaardid järjest nähtavaks.
 
-                String näoTee = "\\Kaardid\\" + diiler.getKäsi().get(0) + ".png";
-                Image näoPilt = new Image(näoTee, 93, 126, true,false);
-                ImageView pildiVaade = new ImageView(näoPilt);
-                diileriEsimeneKaart.getChildren().setAll(pildiVaade);
+                    String näoTee = "\\Kaardid\\" + diiler.getKäsi().get(0) + ".png";
+                    Image näoPilt = new Image(näoTee, 93, 126, true, false);
+                    ImageView pildiVaade = new ImageView(näoPilt);
+                    diileriEsimeneKaart.getChildren().setAll(pildiVaade);
 
-                SequentialTransition st = new SequentialTransition();
-                for (int i = 2; i < diiler.getKäsi().size(); i++) {
-                    PauseTransition paus = new PauseTransition(new Duration(500));
-                    st.getChildren() .addAll(paus, animKaartKätte(diiler.getKäsi().get(i), i, false,true, false));
-                }
-
-                st.setOnFinished(o -> {
-                    if (mängija.käeVäärtus() == 21) kontrolliBlackjacki();
-                    else if (mängija.käeVäärtus() > diiler.käeVäärtus() || diiler.käeVäärtus() > 21) {   // Mängija võit
-                        kuvaTeade("VÕITSID  " + panus + " EUROT!").setOnFinished(e -> {
-                            alustaUusVoor(panus);
-                            kuvaTeade("TEE OMA PANUS");
-                        });
-                    } else {      // Mängija kaotus
-                        kuvaTeade("KAOTASID  " + panus + " EUROT!").setOnFinished(e -> {
-                            alustaUusVoor(-1 * panus);
-                            kuvaTeade("TEE OMA PANUS");
-                        });
+                    SequentialTransition st = new SequentialTransition();
+                    for (int i = 2; i < diiler.getKäsi().size(); i++) {
+                        PauseTransition paus = new PauseTransition(new Duration(500));
+                        st.getChildren().addAll(paus, animKaartKätte(diiler.getKäsi().get(i), i, false, false));
                     }
-                });
 
-                st.play();
+                    st.setOnFinished(o -> {
+                        if (mängija.käeVäärtus() == 21) kontrolliBlackjacki();
+                        else if (mängija.käeVäärtus() > diiler.käeVäärtus() || diiler.käeVäärtus() > 21) {   // Mängija võit
+                            kuvaTeade("VÕITSID  " + panus + " EUROT!").setOnFinished(e -> {
+                                alustaUusVoor(panus);
+                                kuvaTeade("TEE OMA PANUS");
+                            });
+                        } else {      // Mängija kaotus
+                            kuvaTeade("KAOTASID  " + panus + " EUROT!").setOnFinished(e -> {
+                                alustaUusVoor(-1 * panus);
+                                kuvaTeade("TEE OMA PANUS");
+                            });
+                        }
+                    });
+
+                    st.play();
+                }
+                else {
+                    kuvaTeade("ENNE TEE PANUS!");
+                }
             }
         });
     }
@@ -245,7 +252,7 @@ public class Mäng extends Haldur {
     private void teeHit() {
         Kaart kaart = kaardipakk.anna_kaart();
         mängija.võtaKaart(kaart);
-        animKaartKätte(kaart, mängija.getKäsi().size() - 1, true, false, true);
+        animKaartKätte(kaart, mängija.getKäsi().size() - 1, true, true);
 
         if (mängija.käeVäärtus() > 21) {
             kuvaTeade("LÄKSID LÕHKI! KAOTASID " + panus + " EUROT!").setOnFinished(e -> {
@@ -253,9 +260,6 @@ public class Mäng extends Haldur {
 
                 if (mängija.getRaha() > 0) {
                     kuvaTeade("TEE OMA PANUS");
-                }
-                else {
-                    kuvaTeade("SUL ON RAHA OTSAS!");
                 }
             });
             System.out.println("LÕHKI!");
@@ -279,6 +283,12 @@ public class Mäng extends Haldur {
         if (mängija.getRaha() != 0) {
             panuseSlaider.setMax(mängija.getRaha());
         }
+        else {
+            kuvaTeade("SUL SAI RAHA OTSA!").setOnFinished(e -> {
+                MenüüHaldur haldur = new MenüüHaldur();
+                mänguHaldur.setChildren(haldur.getJuur());
+            });
+        }
 
         System.out.println("---------------------------------------------------");
     }
@@ -294,17 +304,19 @@ public class Mäng extends Haldur {
         }
     }
 
-    private Timeline jagaEsimesedKaardid() {
-        Timeline viimaneAnimatisoon = new Timeline();
+    private SequentialTransition jagaEsimesedKaardid() {
+        SequentialTransition pt = new SequentialTransition();
         for (int i = 0; i < 2; i++) {
             Kaart mängijaKaart = kaardipakk.anna_kaart();
             mängija.võtaKaart(mängijaKaart);
-            animKaartKätte(mängijaKaart, i, true, false, true);
+            pt.getChildren().add(animKaartKätte(mängijaKaart, i, true, false));
+
             Kaart diileriKaart = kaardipakk.anna_kaart();
             diiler.võtaKaart(diileriKaart);
-            viimaneAnimatisoon = animKaartKätte(diileriKaart, i, false, false, true);
+            pt.getChildren().add(animKaartKätte(diileriKaart, i, false, false));
         }
-        return viimaneAnimatisoon;
+        pt.play();
+        return pt;
     }
 
     private void animKaardidÄra() {
@@ -327,7 +339,7 @@ public class Mäng extends Haldur {
         pt.play();
     }
 
-    private Timeline animKaartKätte(Kaart kaart, int mitmesKaart, boolean mängijale, boolean diileriLõppVoor, boolean mängiKohe) {
+    private Timeline animKaartKätte(Kaart kaart, int mitmesKaart, boolean mängijale, boolean mängiKohe) {
 
         // Kaardi sätted
         int startX = laius - 43 - 90;
@@ -354,15 +366,15 @@ public class Mäng extends Haldur {
         KeyFrame kf = new KeyFrame(new Duration(500), kv1, kv2);
         tl.getKeyFrames().add(kf);
         tl.setOnFinished(e -> {
-            // Kui pole diileri esimene kaart, siis keeratakse lõpus kaart ümber
-            if (!(!mängijale && mitmesKaart == 0 && !diileriLõppVoor)) {
+            // Kui on diileri esimene kaart siis tagurpidi, muidu keeratakse ümber
+            if (!mängijale && mitmesKaart == 0) {
+                diileriEsimeneKaart = kaardikoht;
+            }
+            else {
                 String näoTee = "\\Kaardid\\" + kaart.toString() + ".png";
                 Image näoPilt = new Image(näoTee, 93, 126, true,false);
                 ImageView pildiVaade = new ImageView(näoPilt);
                 kaardikoht.getChildren().setAll(pildiVaade);
-            }
-            else {
-                diileriEsimeneKaart = kaardikoht;
             }
         });
         if (mängiKohe) tl.play();
