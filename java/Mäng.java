@@ -33,6 +33,8 @@ public class Mäng extends Haldur {
     private boolean panustaNuppAktiivne = true;
     private StackPane diileriEsimeneKaart;
 
+    private boolean lõpetaVajutatud = false;
+
     public Mäng(String mängijanimi, MänguHaldur mänguHaldur) {
         this.mänguHaldur = mänguHaldur;
         mängija.setNimi(mängijanimi);
@@ -149,11 +151,15 @@ public class Mäng extends Haldur {
             if (mouseEvent.getButton() == MouseButton.PRIMARY && panustaNuppAktiivne) {
                 System.out.println("--- PANUSTA ---");
 
-                if (mängija.getKäsi().isEmpty()) {
+                if (mängija.getKäsi().isEmpty() && mängija.getRaha() > 0) {
                     panus = (int) panuseSlaider.getValue();
                     jagaEsimesedKaardid();
                     kontrolliBlackjacki();
                     diiler.näitaKõikiKaarte();
+                }
+
+                if (mängija.getRaha() == 0) {
+                    kuvaTeade("SUL ON RAHA OTSAS");
                 }
 
                 andmed();
@@ -164,6 +170,8 @@ public class Mäng extends Haldur {
     private void kontrolliLõpetaNuppu() {
         lõpetaNupp.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.PRIMARY && panus == 0) {
+                lõpetaVajutatud = true;
+
                 if (uuendaTop5Faili("src/main/resources/edetabel.txt")) {
                     kuvaTeade("SAID EDETABELISSE!").setOnFinished(e -> {
                         MenüüHaldur haldur = new MenüüHaldur();
@@ -200,8 +208,7 @@ public class Mäng extends Haldur {
                 andmed();
 
                 diiler.käik(kaardipakk);
-                //Diiler teeb käigu ära ja siis tehakse ekraanile need kaardid järjest nähtavaks
-                //FIXME See teeb siin nii, et diileri kaardid tuleksid uuesti kaardipakist. Tegelt võiks mingi muutuja selle jaoks olla.
+                //Diiler teeb käigu ära ja siis tehakse ekraanile need kaardid järjest nähtavaks.
 
                 String näoTee = "\\Kaardid\\" + diiler.getKäsi().get(0) + ".png";
                 Image näoPilt = new Image(näoTee, 93, 126, true,false);
@@ -236,7 +243,17 @@ public class Mäng extends Haldur {
         animKaartKätte(kaart, mängija.getKäsi().size() - 1, true, false, true);
 
         if (mängija.käeVäärtus() > 21) {
-            kuvaTeade("LÄKSID LÕHKI! KAOTASID " + panus + " EUROT!").setOnFinished(e -> kuvaTeade("TEE OMA PANUS"));
+            kuvaTeade("LÄKSID LÕHKI! KAOTASID " + panus + " EUROT!").setOnFinished(e -> {
+                if (!lõpetaVajutatud) {
+
+                    if (mängija.getRaha() - panus > 0) {
+                        kuvaTeade("TEE OMA PANUS");
+                    }
+                    else {
+                        kuvaTeade("SUL ON RAHA OTSAS!");
+                    }
+                }
+            });
             System.out.println("LÕHKI!");
             alustaUusVoor(-1 * panus);
         }
@@ -257,10 +274,13 @@ public class Mäng extends Haldur {
 
         if (mängija.getRaha() != 0) {
             panuseSlaider.setMax(mängija.getRaha());
-        }
+        }/*
         else {
-            mängLäbiEkraan();
+            //mängLäbiEkraan();
+            kuvaTeade("SUL ON RAHA OTSAS!");
         }
+
+       */
 
         System.out.println("---------------------------------------------------");
     }
@@ -285,39 +305,6 @@ public class Mäng extends Haldur {
         }
     }
 
-    private void mängLäbiEkraan() {
-        VBox lõpupaneel = new VBox();
-        lõpupaneel.setPrefWidth(450);
-        lõpupaneel.setPrefHeight(200);
-        lõpupaneel.setAlignment(Pos.CENTER);
-        lõpupaneel.setSpacing(30);
-        lõpupaneel.setLayoutX(375);
-        lõpupaneel.setLayoutY(250);
-
-        BackgroundSize taustaSuurus = new BackgroundSize(450, 200, false, false, false, false);
-        Image paneeliPilt = new Image("paneel.png");
-        BackgroundImage paneeliTaustapilt = new BackgroundImage(paneeliPilt, BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, BackgroundPosition.DEFAULT, taustaSuurus);
-        Background paneeliTaust = new Background(paneeliTaustapilt);
-        lõpupaneel.setBackground(paneeliTaust);
-
-        Label teavitus = new Label("Kahjuks sai sul raha otsa!");
-        try {
-            javafx.scene.text.Font font = new Font("Font/EbGaramond12RegularAllSmallcaps-PpOZ.ttf", 25);
-            teavitus.setFont(font);
-        } catch (Exception e) {
-            System.out.println(e + " font ei laadinud ära");
-        }
-
-        Nupp okNupp = new Nupp("OK",0,0);
-        okNupp.setOnMouseClicked(mouseEvent -> {
-            MenüüHaldur haldur = new MenüüHaldur();
-            mänguHaldur.setChildren(haldur.getJuur());
-        });
-
-        lõpupaneel.getChildren().addAll(teavitus, okNupp);
-        mänguHaldur.addChildren(lõpupaneel);
-    }
-
     private void animKaardidÄra() {
         ParallelTransition pt = new ParallelTransition();
         pt.setCycleCount(1);
@@ -338,7 +325,7 @@ public class Mäng extends Haldur {
         panustaNuppAktiivne = false;
         pt.setOnFinished(e -> {
             panustaNuppAktiivne = true;
-            looKaardipakk();
+            if (!lõpetaVajutatud) looKaardipakk();
         });
         pt.play();
     }

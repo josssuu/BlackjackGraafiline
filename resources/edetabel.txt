@@ -1,5 +1,5 @@
 eminem,400
+test,250
 Lil Wayne,245
-Snoop Dogg,204
-Dr Dre,200
-Chris Brown,101
+asd,226
+Joosu,200
